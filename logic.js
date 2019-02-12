@@ -30,14 +30,16 @@ inquirer
                     }
                 ])
             
-                .then(function (trackName) {
-                    if (trackName === undefined) {
+                .then(function (response) {
+                    if (response == '') {
                         trackName === 'All Too Well'
+                    } else {
+                        var trackName = response.name;
+                        console.log(trackName);
                     }
-                    console.log(trackName.name);
                     
                     spotify
-                        .search({ type: 'track', query: trackName.name })
+                        .search({ type: 'track', query: trackName })
                         .then(function (response) {
                             console.log(response.tracks.items[0]);
                         })
