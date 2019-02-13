@@ -71,4 +71,26 @@ if (inquirerResponse.searchEngine === 'movie-search') {
             });
         })
 }
+        
+        if (inquirerResponse.searchEngine === 'concert-search') {
+            inquirer
+                .prompt([
+
+                    {
+                        type: 'input',
+                        message: 'Enter a band/artist name',
+                        name: 'name'
+                    }
+                ])
+
+                .then(function (response) {
+                    artist = response.name;
+                    console.log(artist);
+                    axios
+                        .get("https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp")
+                        .then(function (response) {
+                            console.log(response.data[1].lineup[0]);
+                        });
+                })
+        }
     })
