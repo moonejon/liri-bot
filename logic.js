@@ -2,7 +2,7 @@ require("dotenv").config();
 const keys = require("./keys.js");
 var Spotify = require("node-spotify-api");
 var axios = require("axios");
-var Moment = require("moment");
+var moment = require("moment");
 var inquirer = require("inquirer");
 var spotify = new Spotify(keys.spotify);
 
@@ -31,8 +31,8 @@ inquirer
                 ])
             
                 .then(function (response) {
-                    if (response == '') {
-                        trackName === 'All Too Well'
+                    if (response.name == '') {
+                        var trackName = 'All Too Well'
                     } else {
                         var trackName = response.name;
                         console.log(trackName);
@@ -41,10 +41,13 @@ inquirer
                     spotify
                         .search({ type: 'track', query: trackName })
                         .then(function (response) {
-                            console.log(response.tracks.items[0]);
+                            console.log('Title: ' + response.tracks.items[0].name);
+                            console.log('Artist: ' + response.tracks.items[0].artists[0].name);
+                            console.log('From the album: ' + response.tracks.items[0].album.name);
+                            console.log('Open in browser: ' + response.tracks.items[0].external_urls.spotify)
                         })
                         .catch(function (err) {
-                            console.log(err);
+                            console.log("Perhaps you have mispelled your query. Please try again.");
                         });
                 });
         }
@@ -62,13 +65,26 @@ if (inquirerResponse.searchEngine === 'movie-search') {
         ])
     
         .then(function (response) {
-            movieName = response.name;
-            console.log(movieName);
+            if (response.name == '') {
+                var movieName = 'Titanic'
+            } else {
+                var movieName = response.name;
+                console.log(movieName);
+            }
             axios
                 .get("http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=e189c826")
-            .then(function (response) {
-                console.log("The movie's rating is: " + response.data.imdbRating);
-            });
+                .then(function (response) {
+                    console.log("Title: " + response.data.Title);
+                    console.log("Release Year: " + response.data.Year);
+                    console.log("IMDB Rating: " + response.data.imdbRating);
+                    console.log("Country: " + response.data.Country);
+                    console.log("Language: " + response.data.Language);
+                    console.log("Plot Summary: " + response.data.Plot);
+                    console.log("Cast: " + response.data.Actors)
+                })
+                .catch(function (err) {
+                    console.log("Perhaps you have mispelled your query. Please try again.");
+                });
         })
 }
         
@@ -84,12 +100,25 @@ if (inquirerResponse.searchEngine === 'movie-search') {
                 ])
 
                 .then(function (response) {
-                    artist = response.name;
-                    console.log(artist);
+
+                    if (response.name == '') {
+                        var artist = 'Metallica'
+                    } else {
+                        var artist = response.name;
+                        console.log(artist);
+                    }
+
                     axios
                         .get("https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp")
                         .then(function (response) {
-                            console.log(response.data[1].lineup[0]);
+                            for (i = 0; i < 5; i++) {
+                                console.log("Concert Venue: " + response.data[i].venue.name);
+                                console.log("Location: " + response.data[i].venue.city + ", " + response.data[i].venue.region + ", " + response.data[i].venue.country)
+                                console.log("Date: " + moment(response.data[i].datetime).format("dddd, MMMM Do YYYY, h:mm:ss a") + "\n");
+                            }
+                        })
+                        .catch(function (err) {
+                            console.log("Perhaps you have mispelled your query. Please try again.");
                         });
                 })
         }
