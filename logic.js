@@ -5,6 +5,7 @@ var axios = require("axios");
 var moment = require("moment");
 var inquirer = require("inquirer");
 var spotify = new Spotify(keys.spotify);
+var fs = require("fs");
 
 inquirer
     .prompt([
@@ -12,7 +13,7 @@ inquirer
         {
             type: 'list',
             message: 'Choose an search engine!',
-            choices: ['spotify', 'movie-search', 'concert-search'],
+            choices: ['spotify', 'movie-search', 'concert-search', 'do-what-it-says'],
             name: 'searchEngine'
 
         }
@@ -35,7 +36,6 @@ inquirer
                         var trackName = 'All Too Well'
                     } else {
                         var trackName = response.name;
-                        console.log(trackName);
                     }
                     
                     spotify
@@ -53,40 +53,39 @@ inquirer
         }
     
 
-if (inquirerResponse.searchEngine === 'movie-search') {
-    inquirer
-        .prompt([
+        if (inquirerResponse.searchEngine === 'movie-search') {
+            inquirer
+                .prompt([
 
-            {
-                type: 'input',
-                message: 'Enter a movie name',
-                name: 'name'
-            }
-        ])
+                    {
+                        type: 'input',
+                        message: 'Enter a movie name',
+                        name: 'name'
+                    }
+                ])
     
-        .then(function (response) {
-            if (response.name == '') {
-                var movieName = 'Titanic'
-            } else {
-                var movieName = response.name;
-                console.log(movieName);
-            }
-            axios
-                .get("http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=e189c826")
                 .then(function (response) {
-                    console.log("Title: " + response.data.Title);
-                    console.log("Release Year: " + response.data.Year);
-                    console.log("IMDB Rating: " + response.data.imdbRating);
-                    console.log("Country: " + response.data.Country);
-                    console.log("Language: " + response.data.Language);
-                    console.log("Plot Summary: " + response.data.Plot);
-                    console.log("Cast: " + response.data.Actors)
+                    if (response.name == '') {
+                        var movieName = 'Titanic'
+                    } else {
+                        var movieName = response.name;
+                    }
+                    axios
+                        .get("http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=e189c826")
+                        .then(function (response) {
+                            console.log("Title: " + response.data.Title);
+                            console.log("Release Year: " + response.data.Year);
+                            console.log("IMDB Rating: " + response.data.imdbRating);
+                            console.log("Country: " + response.data.Country);
+                            console.log("Language: " + response.data.Language);
+                            console.log("Plot Summary: " + response.data.Plot);
+                            console.log("Cast: " + response.data.Actors)
+                        })
+                        .catch(function (err) {
+                            console.log("Perhaps you have mispelled your query. Please try again.");
+                        });
                 })
-                .catch(function (err) {
-                    console.log("Perhaps you have mispelled your query. Please try again.");
-                });
-        })
-}
+        }
         
         if (inquirerResponse.searchEngine === 'concert-search') {
             inquirer
@@ -105,7 +104,6 @@ if (inquirerResponse.searchEngine === 'movie-search') {
                         var artist = 'Metallica'
                     } else {
                         var artist = response.name;
-                        console.log(artist);
                     }
 
                     axios
@@ -120,6 +118,44 @@ if (inquirerResponse.searchEngine === 'movie-search') {
                         .catch(function (err) {
                             console.log("Perhaps you have mispelled your query. Please try again.");
                         });
+                })
+        }
+        
+        if (inquirerResponse.searchEngine === 'do-what-it-says') {
+            inquirer
+                .prompt([
+
+                    {
+                        type: 'confirm',
+                        name: 'confirm',
+                        message: 'Are you sure?',
+                        default: true,
+                    }
+                ])
+                .then(function (response) {
+                    if (response) {
+                        fs.readFile("random.txt", "utf8", function (error, data) {
+                            if (error) {
+                                return console.log(error);
+                            }
+                            else {
+                                movieName = data;
+
+                                axios
+                                    .get("http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=e189c826")
+                                    .then(function (response) {
+                                        console.log("Title: " + response.data.Title);
+                                        console.log("Release Year: " + response.data.Year);
+                                        console.log("IMDB Rating: " + response.data.imdbRating);
+                                        console.log("Country: " + response.data.Country);
+                                        console.log("Language: " + response.data.Language);
+                                        console.log("Plot Summary: " + response.data.Plot);
+                                        console.log("Cast: " + response.data.Actors)
+                                    })
+                            }
+                          
+                        })
+                    }
                 })
         }
     })
