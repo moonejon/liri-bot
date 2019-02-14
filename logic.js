@@ -1,22 +1,74 @@
+require("dotenv").config();
+const keys = require("./keys.js");
 var Spotify = require("node-spotify-api");
-var Axios = require("axios");
-var Dotenv = require("dotenv");
-var Moment
+var axios = require("axios");
+var Moment = require("moment");
+var inquirer = require("inquirer");
+var spotify = new Spotify(keys.spotify);
 
-var spotify = new Spotify({
-    id: "f10741a2a8184466b33731526c6785bf",
-    secret: "3a7fc836e82a40578e1e28803b2c3845"
-});
+inquirer
+    .prompt([
 
+        {
+            type: 'list',
+            message: 'Choose an search engine!',
+            choices: ['spotify', 'movie-search', 'concert-search'],
+            name: 'searchEngine'
 
+        }
+    ])
 
-spotify
-    .search({ type: 'track', query: 'All the Small Things' })
-    .then(function (response) {
-        console.log(response);
+    .then(function (inquirerResponse) {
+        if (inquirerResponse.searchEngine === 'spotify') {
+            inquirer
+                .prompt([
+
+                    {
+                        type: 'input',
+                        message: 'Enter a song name',
+                        name: 'name'
+                    }
+                ])
+            
+                .then(function (response) {
+                    if (response == '') {
+                        trackName === 'All Too Well'
+                    } else {
+                        var trackName = response.name;
+                        console.log(trackName);
+                    }
+                    
+                    spotify
+                        .search({ type: 'track', query: trackName })
+                        .then(function (response) {
+                            console.log(response.tracks.items[0]);
+                        })
+                        .catch(function (err) {
+                            console.log(err);
+                        });
+                });
+        }
+    
+
+if (inquirerResponse.searchEngine === 'movie-search') {
+    inquirer
+        .prompt([
+
+            {
+                type: 'input',
+                message: 'Enter a movie name',
+                name: 'name'
+            }
+        ])
+    
+        .then(function (response) {
+            movieName = response.name;
+            console.log(movieName);
+            axios
+                .get("http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=e189c826")
+            .then(function (response) {
+                console.log("The movie's rating is: " + response.data.imdbRating);
+            });
+        })
+}
     })
-    .catch(function (err) {
-        console.log(err);
-    });
-
-spotify.search(track, dont stop believing);
