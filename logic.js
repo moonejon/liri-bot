@@ -102,10 +102,10 @@ inquirer
 
                     if (response.name == '') {
                         var artist = 'Metallica'
-                        console.log('Upcoming shows for Metallica');
+                        console.log('Upcoming shows for Metallica \n');
                     } else {
                         var artist = response.name;
-                        console.log('Upcoming shows for ' + artist);
+                        console.log('Upcoming shows for ' + artist + "\n");
                     }
 
                     axios
